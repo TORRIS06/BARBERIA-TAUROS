@@ -62,6 +62,10 @@ export default function AdminBarbersScreen() {
     setEditandoId] =
     useState(null)
 
+  const [nombreAnterior,
+    setNombreAnterior] =
+    useState('')
+
   const {
     darkMode
   } =
@@ -130,6 +134,7 @@ export default function AdminBarbersScreen() {
       setImagen('')
       setActivo(true)
       setEditandoId(null)
+      setNombreAnterior('')
     }
 
   const abrirAgregar =
@@ -144,6 +149,10 @@ export default function AdminBarbersScreen() {
     (barbero) => {
 
       setNombre(
+        barbero.nombre
+      )
+
+      setNombreAnterior(
         barbero.nombre
       )
 
@@ -227,6 +236,8 @@ export default function AdminBarbersScreen() {
 
       if (editandoId) {
 
+        // ACTUALIZAR BARBERO
+
         const { error } =
           await supabase
             .from('barberos')
@@ -248,6 +259,69 @@ export default function AdminBarbersScreen() {
           )
 
           return
+        }
+
+        // ACTUALIZAR HORARIOS
+        // CON EL NUEVO NOMBRE
+
+        const {
+          error: errorHorarios
+        } =
+          await supabase
+            .from('horarios')
+            .update({
+              barbero: nombre
+            })
+            .eq(
+              'barbero',
+              nombreAnterior
+            )
+
+        if (errorHorarios) {
+
+          console.log(errorHorarios)
+
+          Alert.alert(
+            'Error actualizando horarios'
+          )
+
+          return
+        }
+
+        // ACTUALIZAR SILLAS
+        // CON EL NUEVO NOMBRE
+
+        const {
+          data: sillasData,
+          error: errorBuscarSillas
+        } =
+          await supabase
+            .from('sillas')
+            .select(`
+              id,
+              barberos (
+                id,
+                nombre
+              )
+            `)
+
+        if (!errorBuscarSillas) {
+
+          for (const silla of sillasData) {
+
+            if (
+              silla.barberos?.nombre ===
+              nombreAnterior
+            ) {
+
+              await supabase
+                .from('sillas')
+                .update({
+                  estado: 'libre'
+                })
+                .eq('id', silla.id)
+            }
+          }
         }
 
         Alert.alert(

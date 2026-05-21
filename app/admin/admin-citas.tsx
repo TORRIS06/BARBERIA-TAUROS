@@ -352,92 +352,100 @@ export default function AdminCitasScreen() {
         )
       }
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.barbersContainer}
-      >
+      <View style={styles.barbersWrapper}>
 
-        <TouchableOpacity
-          style={[
-            styles.barberButton,
-            {
-              backgroundColor:
-                filtroBarbero === ''
-                  ? '#DE7123'
-                  : inputColor
-            }
-          ]}
-          onPress={() =>
-            setFiltroBarbero('')
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={
+            styles.barbersContent
           }
         >
 
-          <Text
+          <TouchableOpacity
             style={[
-              styles.barberText,
+              styles.barberButton,
               {
-                color:
+                backgroundColor:
                   filtroBarbero === ''
-                    ? '#FFFFFF'
-                    : textColor
+                    ? '#DE7123'
+                    : inputColor
               }
             ]}
+            onPress={() =>
+              setFiltroBarbero('')
+            }
           >
-            Todos
-          </Text>
 
-        </TouchableOpacity>
-
-        {
-          barberos.map(
-            (barbero) => (
-
-              <TouchableOpacity
-                key={barbero.id}
-
-                style={[
-                  styles.barberButton,
-                  {
-                    backgroundColor:
-                      filtroBarbero ===
-                      barbero.nombre
-                        ? '#DE7123'
-                        : inputColor
-                  }
-                ]}
-
-                onPress={() =>
-                  setFiltroBarbero(
-                    barbero.nombre
-                  )
+            <Text
+              style={[
+                styles.barberText,
+                {
+                  color:
+                    filtroBarbero === ''
+                      ? '#FFFFFF'
+                      : textColor
                 }
-              >
+              ]}
+              numberOfLines={1}
+            >
+              Todos
+            </Text>
 
-                <Text
+          </TouchableOpacity>
+
+          {
+            barberos.map(
+              (barbero) => (
+
+                <TouchableOpacity
+                  key={barbero.id}
+
                   style={[
-                    styles.barberText,
+                    styles.barberButton,
                     {
-                      color:
+                      backgroundColor:
                         filtroBarbero ===
                         barbero.nombre
-                          ? '#FFFFFF'
-                          : textColor
+                          ? '#DE7123'
+                          : inputColor
                     }
                   ]}
-                >
-                  💈 {
-                    barbero.nombre
+
+                  onPress={() =>
+                    setFiltroBarbero(
+                      barbero.nombre
+                    )
                   }
-                </Text>
+                >
 
-              </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.barberText,
+                      {
+                        color:
+                          filtroBarbero ===
+                          barbero.nombre
+                            ? '#FFFFFF'
+                            : textColor
+                      }
+                    ]}
+                    numberOfLines={1}
+                  >
+                    💈 {
+                      barbero.nombre
+                    }
+                  </Text>
 
+                </TouchableOpacity>
+
+              )
             )
-          )
-        }
+          }
 
-      </ScrollView>
+        </ScrollView>
+
+      </View>
 
       {
         citasFiltradas.length === 0 ? (
@@ -480,6 +488,10 @@ export default function AdminCitasScreen() {
             }
 
             showsVerticalScrollIndicator={false}
+
+            contentContainerStyle={{
+              paddingBottom: 120
+            }}
 
             renderItem={({ item }) => (
 
@@ -627,16 +639,29 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
 
+  barbersWrapper: {
+    minHeight: 70,
+    marginBottom: 20,
+    justifyContent: 'center'
+  },
+
   barbersContainer: {
-    marginBottom: 20
+    flexGrow: 0
+  },
+
+  barbersContent: {
+    paddingRight: 20,
+    paddingVertical: 10,
+    alignItems: 'center'
   },
 
   barberButton: {
+    minWidth: 150,
     paddingVertical: 12,
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
     borderRadius: 14,
     marginRight: 10,
-    height: 48,
+    minHeight: 48,
     justifyContent: 'center',
     alignItems: 'center'
   },
