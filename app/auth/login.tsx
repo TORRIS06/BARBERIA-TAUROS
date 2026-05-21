@@ -12,7 +12,8 @@ import {
 
 import {
   useState,
-  useContext
+  useContext,
+  useEffect
 } from 'react'
 
 import {
@@ -57,6 +58,16 @@ export default function LoginScreen() {
       ? '#FFFFFF'
       : '#000000'
 
+  useEffect(() => {
+
+    // LIMPIAR CAMPOS
+    // AL ENTRAR AL LOGIN
+
+    setUsuario('')
+    setPassword('')
+
+  }, [])
+
   const iniciarSesion =
     () => {
 
@@ -65,7 +76,15 @@ export default function LoginScreen() {
         password === '1234'
       ) {
 
-        router.push('/admin/admin')
+        // LIMPIAR INPUTS
+
+        setUsuario('')
+        setPassword('')
+
+        // REEMPLAZAR RUTA
+        // PARA EVITAR VOLVER ATRÁS
+
+        router.replace('/admin/admin')
 
       } else {
 
@@ -146,6 +165,11 @@ export default function LoginScreen() {
               placeholderTextColor='#999'
               value={usuario}
               onChangeText={setUsuario}
+
+              autoComplete='off'
+              autoCorrect={false}
+              textContentType='none'
+
             />
 
             <Text
@@ -170,7 +194,13 @@ export default function LoginScreen() {
               ]}
               placeholder='Ingrese contraseña'
               placeholderTextColor='#999'
-              secureTextEntry
+
+              secureTextEntry={true}
+
+              autoComplete='off'
+              autoCorrect={false}
+              textContentType='none'
+
               value={password}
               onChangeText={setPassword}
             />
