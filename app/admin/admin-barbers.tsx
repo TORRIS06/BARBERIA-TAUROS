@@ -262,7 +262,6 @@ export default function AdminBarbersScreen() {
         }
 
         // ACTUALIZAR HORARIOS
-        // CON EL NUEVO NOMBRE
 
         const {
           error: errorHorarios
@@ -288,40 +287,30 @@ export default function AdminBarbersScreen() {
           return
         }
 
-        // ACTUALIZAR SILLAS
-        // CON EL NUEVO NOMBRE
+        // ACTUALIZAR CITAS
 
         const {
-          data: sillasData,
-          error: errorBuscarSillas
+          error: errorCitas
         } =
           await supabase
-            .from('sillas')
-            .select(`
-              id,
-              barberos (
-                id,
-                nombre
-              )
-            `)
-
-        if (!errorBuscarSillas) {
-
-          for (const silla of sillasData) {
-
-            if (
-              silla.barberos?.nombre ===
+            .from('citas')
+            .update({
+              barbero: nombre
+            })
+            .eq(
+              'barbero',
               nombreAnterior
-            ) {
+            )
 
-              await supabase
-                .from('sillas')
-                .update({
-                  estado: 'libre'
-                })
-                .eq('id', silla.id)
-            }
-          }
+        if (errorCitas) {
+
+          console.log(errorCitas)
+
+          Alert.alert(
+            'Error actualizando citas'
+          )
+
+          return
         }
 
         Alert.alert(
@@ -331,6 +320,7 @@ export default function AdminBarbersScreen() {
       } else {
 
         const {
+          data: nuevoBarbero,
           error
         } =
           await supabase
@@ -344,6 +334,7 @@ export default function AdminBarbersScreen() {
                 activo
               }
             ])
+            .select()
 
         if (error) {
 
@@ -373,7 +364,7 @@ export default function AdminBarbersScreen() {
           horariosDefault.map(
             (hora) => ({
               barbero: nombre,
-              hora: hora
+              hora: hora,
             })
           )
 
@@ -436,6 +427,8 @@ export default function AdminBarbersScreen() {
                   return
                 }
 
+                // ELIMINAR HORARIOS
+
                 const {
                   error: errorHorarios
                 } =
@@ -460,6 +453,63 @@ export default function AdminBarbersScreen() {
                   return
                 }
 
+                // ELIMINAR CITAS
+
+                const {
+                  error: errorCitas
+                } =
+                  await supabase
+                    .from('citas')
+                    .delete()
+                    .eq(
+                      'barbero',
+                      barbero.nombre
+                    )
+
+                if (errorCitas) {
+
+                  console.log(
+                    errorCitas
+                  )
+
+                  Alert.alert(
+                    'Error eliminando citas'
+                  )
+
+                  return
+                }
+
+                // LIBERAR SILLA
+
+                const {
+                  error: errorSilla
+                } =
+                  await supabase
+                    .from('sillas')
+                    .update({
+                      barbero_id: null,
+                      estado: 'libre'
+                    })
+                    .eq(
+                      'barbero_id',
+                      id
+                    )
+
+                if (errorSilla) {
+
+                  console.log(
+                    errorSilla
+                  )
+
+                  Alert.alert(
+                    'Error liberando silla'
+                  )
+
+                  return
+                }
+
+                // ELIMINAR BARBERO
+
                 const { error } =
                   await supabase
                     .from('barberos')
@@ -478,7 +528,7 @@ export default function AdminBarbersScreen() {
                 }
 
                 Alert.alert(
-                  'Barbero eliminado'
+                  'Barbero eliminado correctamente'
                 )
 
                 obtenerBarberos()
