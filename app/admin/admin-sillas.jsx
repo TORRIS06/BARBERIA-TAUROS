@@ -275,6 +275,45 @@ export default function AdminSillasScreen() {
   const guardarEdicion =
     async () => {
 
+      if (
+        nuevoNombre.trim() === ''
+      ) {
+
+        Alert.alert(
+          'Error',
+          'El nombre no puede estar vacío'
+        )
+
+        return
+      }
+
+      // VALIDAR QUE EL BARBERO
+      // NO TENGA OTRA SILLA
+
+      if (barberoSeleccionado) {
+
+        const sillaExistente =
+          sillas.find(
+            (silla) =>
+
+              silla.barbero_id ===
+              barberoSeleccionado &&
+
+              silla.id !==
+              sillaEditando.id
+          )
+
+        if (sillaExistente) {
+
+          Alert.alert(
+            'Barbero ocupado',
+            'Ese barbero ya tiene una silla asignada'
+          )
+
+          return
+        }
+      }
+
       const { error } =
         await supabase
           .from('sillas')
@@ -557,46 +596,115 @@ export default function AdminSillasScreen() {
               }}
             >
 
+              <TouchableOpacity
+                style={[
+                  styles.barberoItem,
+                  {
+                    backgroundColor:
+                      barberoSeleccionado === null
+                        ? '#DE7123'
+                        : inputColor
+                  }
+                ]}
+
+                onPress={() =>
+                  setBarberoSeleccionado(null)
+                }
+              >
+
+                <Text
+                  style={{
+                    color:
+                      barberoSeleccionado === null
+                        ? '#FFFFFF'
+                        : textColor,
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Sin asignar
+                </Text>
+
+              </TouchableOpacity>
+
               {
-                barberos.map((barbero) => (
+                barberos.map((barbero) => {
 
-                  <TouchableOpacity
-                    key={barbero.id}
+                  const sillaOcupada =
+                    sillas.find(
+                      (silla) =>
 
-                    style={[
-                      styles.barberoItem,
-                      {
-                        backgroundColor:
-                          barberoSeleccionado ===
+                        silla.barbero_id ===
+                        barbero.id &&
+
+                        silla.id !==
+                        sillaEditando?.id
+                    )
+
+                  const deshabilitado =
+                    !!sillaOcupada
+
+                  return (
+
+                    <TouchableOpacity
+                      key={barbero.id}
+
+                      disabled={deshabilitado}
+
+                      style={[
+                        styles.barberoItem,
+                        {
+                          backgroundColor:
+                            barberoSeleccionado ===
+                            barbero.id
+                              ? '#DE7123'
+                              : inputColor,
+
+                          opacity:
+                            deshabilitado
+                              ? 0.4
+                              : 1
+                        }
+                      ]}
+
+                      onPress={() =>
+                        setBarberoSeleccionado(
                           barbero.id
-                            ? '#DE7123'
-                            : inputColor
+                        )
                       }
-                    ]}
-
-                    onPress={() =>
-                      setBarberoSeleccionado(
-                        barbero.id
-                      )
-                    }
-                  >
-
-                    <Text
-                      style={{
-                        color:
-                          barberoSeleccionado ===
-                          barbero.id
-                            ? '#FFFFFF'
-                            : textColor,
-                        fontWeight: 'bold'
-                      }}
                     >
-                      {barbero.nombre}
-                    </Text>
 
-                  </TouchableOpacity>
+                      <Text
+                        style={{
+                          color:
+                            barberoSeleccionado ===
+                            barbero.id
+                              ? '#FFFFFF'
+                              : textColor,
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {barbero.nombre}
+                      </Text>
 
-                ))
+                      {
+                        deshabilitado && (
+
+                          <Text
+                            style={{
+                              color: '#B3261E',
+                              marginTop: 5
+                            }}
+                          >
+                            Ya tiene silla asignada
+                          </Text>
+
+                        )
+                      }
+
+                    </TouchableOpacity>
+
+                  )
+                })
               }
 
             </ScrollView>
